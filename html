@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q&A Website</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #questionSection, #adminSection { display: none; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Q&A Website</h1>
+    
+    <div id="nameSection">
+        <h2>Enter Your Full Name</h2>
+        <input type="text" id="fullName" placeholder="Full Name">
+        <button onclick="saveName()">Continue</button>
+    </div>
+    
+    <div id="questionSection">
+        <h2>Answer These Questions</h2>
+        <p>Who is your crush or love?</p>
+        <input type="text" id="crush" placeholder="Your crush or love">
+        
+        <p>Are you happy? (Yes/No)</p>
+        <input type="text" id="happy" placeholder="Yes or No">
+        
+        <div id="reasonSection" style="display: none;">
+            <p>Why are you happy? Or if not, what does your partner need to improve?</p>
+            <input type="text" id="reason" placeholder="Your reason">
+        </div>
+        
+        <p>Do you have a crush on someone else? (Yes/No)</p>
+        <input type="text" id="otherCrush" placeholder="Yes or No">
+        
+        <div id="crushNameSection" style="display: none;">
+            <p>Enter your crush's name:</p>
+            <input type="text" id="crushName" placeholder="Crush Name">
+        </div>
+        
+        <button onclick="submitAnswers()">Submit</button>
+    </div>
+    
+    <div id="adminSection">
+        <h2>Admin Panel - View Responses</h2>
+        <button onclick="viewResponses()">Load Responses</button>
+        <div id="responses"></div>
+    </div>
+    
+    <script>
+        function saveName() {
+            let userName = document.getElementById("fullName").value;
+            if (userName) {
+                document.getElementById("nameSection").style.display = "none";
+                document.getElementById("questionSection").style.display = "block";
+            } else {
+                alert("Please enter your full name.");
+            }
+        }
+        
+        document.getElementById("happy").addEventListener("input", function() {
+            let value = this.value.toLowerCase();
+            document.getElementById("reasonSection").style.display = (value === "no") ? "block" : "none";
+        });
+        
+        document.getElementById("otherCrush").addEventListener("input", function() {
+            let value = this.value.toLowerCase();
+            document.getElementById("crushNameSection").style.display = (value === "yes") ? "block" : "none";
+        });
+        
+        function submitAnswers() {
+            let answers = {
+                fullName: document.getElementById("fullName").value,
+                crush: document.getElementById("crush").value,
+                happy: document.getElementById("happy").value,
+                reason: document.getElementById("reason").value,
+                otherCrush: document.getElementById("otherCrush").value,
+                crushName: document.getElementById("crushName").value
+            };
+            
+            let allResponses = JSON.parse(localStorage.getItem("allResponses")) || [];
+            allResponses.push(answers);
+            localStorage.setItem("allResponses", JSON.stringify(allResponses));
+            
+            if (answers.otherCrush.toLowerCase() === "yes") {
+                alert("Kill your feelings for them and stay loyal to your partner.");
+                window.close();
+            } else {
+                alert("Thank you for your responses!");
+            }
+        }
+        
+        function viewResponses() {
+            let adminPassword = prompt("Enter Admin Password:");
+            if (adminPassword !== "dipan374") {
+                alert("Wrong password!");
+                return;
+            }
+            
+            let allResponses = JSON.parse(localStorage.getItem("allResponses")) || [];
+            let responseDiv = document.getElementById("responses");
+            responseDiv.innerHTML = "";
+            
+            allResponses.forEach((response, index) => {
+                responseDiv.innerHTML += `<p><strong>${index + 1}. ${response.fullName}</strong> - Crush: ${response.crush}, Happy: ${response.happy}, Reason: ${response.reason}, Other Crush: ${response.otherCrush}, Crush Name: ${response.crushName}</p>`;
+            });
+        }
+        
+        function checkAdminAccess() {
+            let adminPassword = prompt("Enter Admin Password:");
+            if (adminPassword === "dipan374") {
+                document.getElementById("nameSection").style.display = "none";
+                document.getElementById("questionSection").style.display = "none";
+                document.getElementById("adminSection").style.display = "block";
+            } else {
+                alert("Wrong password!");
+            }
+        }
+    </script>
+    
+    <button onclick="checkAdminAccess()">Admin Login</button>
+</body>
+</html>
